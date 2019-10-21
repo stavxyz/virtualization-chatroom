@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7.3
 
 # This sets the working directory of the container instance.
 WORKDIR /usr/src/app
