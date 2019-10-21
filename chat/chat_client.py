@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from socket import *
-from threading import Thread
+import os
+import socket
+import threading
 
 
 def receive():
@@ -23,21 +24,23 @@ def send():
             break
 
 
-HOST = input("Enter host: ")
-PORT = input("Enter port: ")
-if not PORT:
-    PORT = 33000
-else:
-    PORT = int(PORT)
+CHAT_SERVER_HOST = os.getenv("CHAT_SERVER_HOST", "127.0.0.1")
+CHAT_SERVER_PORT = os.getenv("CHAT_SERVER_PORT", 1119)
+
+print(
+    "Connecting to chat server at {HOST}:{PORT}".format(
+        HOST=CHAT_SERVER_HOST, PORT=CHAT_SERVER_PORT
+    )
+)
 
 BUFSIZ = 1024
-ADDR = (HOST, PORT)
+ADDR = (CHAT_SERVER_HOST, int(CHAT_SERVER_PORT))
 
-client_socket = socket(AF_INET, SOCK_STREAM)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(ADDR)
 
-receive_thread = Thread(target=receive)
-send_thread = Thread(target=send)
+receive_thread = threading.Thread(target=receive)
+send_thread = threading.Thread(target=send)
 receive_thread.start()
 send_thread.start()
 receive_thread.join()

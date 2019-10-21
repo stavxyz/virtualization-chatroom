@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Server for multithreaded (asynchronous) chat application."""
-from socket import AF_INET, socket, SOCK_STREAM
-from threading import Thread
+
+import logging
+import os
+import socket
+import threading
 
 
 def accept_incoming_connections():
@@ -11,11 +14,12 @@ def accept_incoming_connections():
         print("%s:%s has connected." % client_address)
         client.send(
             bytes(
-                "Greetings from the cave! Now type your name and press enter!", "utf8"
+                "Welcome to bueno.networks chat! Type your name and press enter!",
+                "utf8",
             )
         )
         addresses[client] = client_address
-        Thread(target=handle_client, args=(client,)).start()
+        threading.Thread(target=handle_client, args=(client,)).start()
 
 
 def handle_client(client):  # Takes client socket as argument.
@@ -31,8 +35,11 @@ def handle_client(client):  # Takes client socket as argument.
     while True:
         msg = client.recv(BUFSIZ)
         if msg != bytes("{quit}", "utf8"):
+            logging.debug('CHAT LOG | [{name}] "{msg}"'.format(
+                name=name, msg=msg.decode("utf-8")))
             broadcast(msg, name + ": ")
         else:
+            logging.info('{name} is leaving the chat'.format(name=name))
             client.send(bytes("{quit}", "utf8"))
             client.close()
             del clients[client]
@@ -44,24 +51,31 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
     """Broadcasts a message to all the clients."""
 
     for sock in clients:
-        sock.send(bytes(prefix, "utf8") + msg)
+        try:
+            sock.send(bytes(prefix, "utf8") + msg)
+        except BrokenPipeError as bpe:
+            logging.error("Client hung up: %s" % bpe)
+            raise
 
 
 clients = {}
 addresses = {}
 
-HOST = ""
-PORT = 33001
-BUFSIZ = 1024
-ADDR = (HOST, PORT)
+logging.basicConfig(level=logging.DEBUG)
 
-SERVER = socket(AF_INET, SOCK_STREAM)
+HOST = os.getenv("CHAT_SERVER_HOST", "127.0.0.1")
+PORT = os.getenv("CHAT_SERVER_PORT", 1119)
+BUFSIZ = 1024
+ADDR = (HOST, int(PORT))
+
+print("Running at {HOST}:{PORT}".format(HOST=HOST, PORT=PORT))
+SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 SERVER.bind(ADDR)
 
 if __name__ == "__main__":
     SERVER.listen(5)
     print("Waiting for connection...")
-    ACCEPT_THREAD = Thread(target=accept_incoming_connections)
+    ACCEPT_THREAD = threading.Thread(target=accept_incoming_connections)
     ACCEPT_THREAD.start()
     ACCEPT_THREAD.join()
     SERVER.close()
