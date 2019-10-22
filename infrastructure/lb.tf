@@ -38,10 +38,29 @@ resource "digitalocean_loadbalancer" "application_public_lb" {
     entry_port     = 443
     entry_protocol = "https"
 
-    target_port     = 8081
-    target_protocol = "http"
+    target_port     = 1119
+    target_protocol = "tcp"
 
     certificate_id = digitalocean_certificate.cert.id
+  }
+
+  forwarding_rule {
+    entry_port     = 80
+    entry_protocol = "http"
+
+    target_port     = 1119
+    target_protocol = "tcp"
+
+    certificate_id = digitalocean_certificate.cert.id
+  }
+
+  forwarding_rule {
+    entry_port     = 1119
+    entry_protocol = "tcp"
+
+    target_port     = 1119
+    target_protocol = "tcp"
+
   }
 
   forwarding_rule {
