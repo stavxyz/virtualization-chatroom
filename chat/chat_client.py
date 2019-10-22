@@ -24,7 +24,7 @@ def send():
             break
 
 
-CHAT_SERVER_HOST = os.getenv("CHAT_SERVER_HOST", "127.0.0.1")
+CHAT_SERVER_HOST = os.getenv("CHAT_SERVER_HOST", "bueno.network")
 CHAT_SERVER_PORT = os.getenv("CHAT_SERVER_PORT", 1119)
 
 print(
