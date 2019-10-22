@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Script for Tkinter GUI chat client."""
+import os
+
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
@@ -55,16 +57,17 @@ send_button.pack()
 
 top.protocol("WM_DELETE_WINDOW", on_closing)
 
-# ----Now comes the sockets part----
-HOST = input("Enter host: ")
-PORT = input("Enter port: ")
-if not PORT:
-    PORT = 33000
-else:
-    PORT = int(PORT)
+CHAT_SERVER_HOST = os.getenv("CHAT_SERVER_HOST", "bueno.network")
+CHAT_SERVER_PORT = os.getenv("CHAT_SERVER_PORT", 1119)
+
+print(
+    "Connecting to chat server at {HOST}:{PORT}".format(
+        HOST=CHAT_SERVER_HOST, PORT=CHAT_SERVER_PORT
+    )
+)
 
 BUFSIZ = 1024
-ADDR = (HOST, PORT)
+ADDR = (CHAT_SERVER_HOST, int(CHAT_SERVER_PORT))
 
 client_socket = socket(AF_INET, SOCK_STREAM)
 client_socket.connect(ADDR)
