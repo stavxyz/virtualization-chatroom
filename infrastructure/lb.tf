@@ -39,7 +39,7 @@ resource "digitalocean_loadbalancer" "application_public_lb" {
     entry_protocol = "https"
 
     target_port     = 1119
-    target_protocol = "tcp"
+    target_protocol = "http"
 
     certificate_id = digitalocean_certificate.cert.id
   }
@@ -49,7 +49,7 @@ resource "digitalocean_loadbalancer" "application_public_lb" {
     entry_protocol = "http"
 
     target_port     = 1119
-    target_protocol = "tcp"
+    target_protocol = "http"
 
     certificate_id = digitalocean_certificate.cert.id
   }
