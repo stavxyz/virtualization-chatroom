@@ -1,4 +1,4 @@
-# Cloud Infrastructure for learn-containers
+# Cloud Infrastructure for virtualization-chatroom
 
 ## Requirements
 
